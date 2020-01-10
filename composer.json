@@ -1,0 +1,16 @@
+{
+  "name": "drupal/atomizer",
+  "type": "drupal-module",
+  "description": "Interactively create atoms in a 3D image that can be rotated, saved, etc.",
+  "keywords": ["Drupal"],
+  "license": "GPL-2.0+",
+  "homepage": "https://www.drupal.org/project/atomizer",
+  "minimum-stability": "dev",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/atomizer",
+    "source": "http://cgit.drupalcode.org/atomizer"
+  },
+  "require": {
+    "acquia/lightning": "~3.0.1"
+  }
+}

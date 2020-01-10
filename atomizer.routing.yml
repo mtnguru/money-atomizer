@@ -1,0 +1,103 @@
+
+# In order to to create pages it is necessary to define routes for them.
+# A route maps a URL path to a controller. It defines what function
+# or method will be called when a URL is accessed.
+# If the user accesses http://drupal8.dev//atom/builder, the routing
+# system will look for a route with that path. In this case it will find a
+# match, and execute the _controller callback. In this case the callback is
+# defined as a classname
+# ("\Drupal\atomizer\Controller\AtomizerController")
+# and a method ("atomBuilder").
+# atomizer.atomizer_controller_atomBuilder:
+#  path: '/atom/builder'
+#  defaults:
+#    _controller: '\Drupal\atomizer\Controller\AtomizerController::atomBuilder'
+#    _title: 'Atomizer'
+#  requirements:
+#    _permission: 'access content'
+atomizer.renderNode:
+  path: '/ajax/renderNode'
+  defaults:
+    _controller: '\Drupal\atomizer\Controller\AtomizerController::renderNode'
+  requirements:
+    _permission: 'access content'
+atomizer.renderWebform:
+  path: '/ajax/renderWebform'
+  defaults:
+    _controller: '\Drupal\atomizer\Controller\AtomizerController::renderWebform'
+  requirements:
+    _permission: 'access content'
+atomizer.loadYml:
+  path: '/ajax/loadYml'
+  defaults:
+    _controller: '\Drupal\atomizer\Controller\AtomizerController::loadYml'
+  requirements:
+    _permission: 'access content'
+atomizer.saveYml:
+  path: '/ajax/saveYml'
+  defaults:
+    _controller: '\Drupal\atomizer\Controller\AtomizerController::saveYml'
+  requirements:
+    _permission: 'access content'
+atomizer.listDirectory:
+  path: '/ajax/listDirectory'
+  defaults:
+    _controller: '\Drupal\atomizer\Controller\AtomizerController::listDirectory'
+  requirements:
+    _permission: 'access content'
+atomizer.loadAtomForm:
+  path: '/ajax/loadAtomForm'
+  defaults:
+    _controller: '\Drupal\atomizer\Controller\AtomizerController::loadAtomForm'
+  requirements:
+    _permission: 'access content'
+atomizer.loadAtom:
+  path: '/ajax/loadAtom'
+  defaults:
+    _controller: '\Drupal\atomizer\Controller\AtomizerController::loadAtom'
+  requirements:
+    _permission: 'access content'
+atomizer.loadMolecule:
+  path: '/ajax/loadMolecule'
+  defaults:
+    _controller: '\Drupal\atomizer\Controller\AtomizerController::loadMolecule'
+  requirements:
+    _permission: 'access content'
+atomizer.loadScene:
+  path: '/ajax/loadScene'
+  defaults:
+    _controller: '\Drupal\atomizer\Controller\AtomizerController::loadScene'
+  requirements:
+    _permission: 'access content'
+atomizer.saveAtom:
+  path: '/ajax/saveAtom'
+  defaults:
+    _controller: '\Drupal\atomizer\Controller\AtomizerController::saveAtom'
+  requirements:
+    _permission: 'access content'
+atomizer.saveImage:
+  path: '/ajax/saveImage'
+  defaults:
+    _controller: '\Drupal\atomizer\Controller\AtomizerController::saveImage'
+  requirements:
+    _permission: 'access content'
+atomizer.loadNode:
+  path: '/ajax/loadNode'
+  defaults:
+    _controller: '\Drupal\atomizer\Controller\AtomizerController::loadNode'
+  requirements:
+    _permission: 'access content'
+atomizer.loadDialog:
+  path: '/ajax/loadDialog'
+  defaults:
+    _controller: '\Drupal\atomizer\Controller\AtomizerController::loadDialog'
+  requirements:
+    _permission: 'access content'
+atomizer.loadAtomList:
+  path: '/ajax/loadAtomList'
+  defaults:
+    _controller: '\Drupal\atomizer\Controller\AtomizerController::loadAtomList'
+  requirements:
+    _permission: 'access content'
+
+

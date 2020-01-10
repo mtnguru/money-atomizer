@@ -1,0 +1,36 @@
+<div class="select-item-wrapper" data-nid="{{ nid }}">
+
+  <div class="default-isotope stability-{{ stability | lower }}">
+    {% set expand_isotopes = (num_isotopes > 0) ? 'expand' : '' %}
+    {% set expand_isobars = (num_isobars > 0) ? 'expand' : '' %}
+    <span class="atomic-number">{{ atomic_number }}</span>
+    <span class="atom-title {{ stability | lower }}">
+      <a href="#" class="atom-name select-item-name nid-{{ default_atom_nid }}"
+        data-nid="{{ default_atom_nid }}"
+        data-stability="{{ isotope.name }}"
+      >
+        <span class="symbol">{{ symbol }}</span>
+        <span class="title">{{ title }}</span>
+      </a>
+    </span>
+    <span class="num-isotopes az-closed {{ expand_isotopes }}">{{ num_isotopes }}</span>
+  </div>
+
+  <div class="isotopes az-closed" title="Isotopes">
+    {% if num_isotopes > 0  %}
+      <ul class="isotope-list">
+        {% for isotope in isotopes %}
+          {% set default = (isotope.nid == nid) ? 'default' : 'not-default'  %}
+          <li class="isotope {{ default }}">
+            <a href="#" class="atom-name nid-{{ isotope.nid }}"
+               data-nid="{{ isotope.nid }}"
+               data-stability="{{ isotope.name | lower }}"
+            >
+              {{ isotope.title }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+</div>

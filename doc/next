@@ -1,0 +1,129 @@
+I think the atom builder is back - check out the viewer, birkeland and platonic solids.
+
+
+
+Finish the Structured Atom site.
+Figure out how to store resources.
+Create the module to store links - almost like the instagram modules.
+Store a link, allow it to be referenced like any other resource.
+
+I have the ability to store private content.  Now I need to filter for it in my query.  It's close
+I have separate menu and themes for the colors and pages
+The Domain module helps a lot. Not everything.
+
+Resources is where I need to work now.
+Allow for selection by topic.
+I need a curator.
+
+How do I push all this work forward. Going back now is a mistake.
+Finish this. 
+Figure out MailChimp and Subscriptions.
+
+Is this really the answer?  You've put considerable effort into it.
+Are you going to pursue it to the end?
+Why are you holding back?
+Get it out there.
+Make it public.
+
+Do the mail chimp thing - tomorrow with Teresa.
+Figure out how to send shit to everyone.
+
+Give Edo the ability to save his contacts.
+Send out to everybody a periodic update.
+Ask for money?
+Ask for money?
+How? 
+
+
+
+
+What next?
+Do something........Then get on with life.
+
+What the fuck should we do next?  I don't know.......
+Goto the d8 site and load lightning.
+Also load auto-save
+
+
+Boron neutrons
+Fix viewer to screen - what does that mean?
+Could I simply make it same size as the screen?
+Then there wouldn't ever be a scroll bar.
+Sound good.
+Make it work.
+
+Fix the theme(s) on the basic viewer.
+
+
+
+Done - Made vertices work again.
+Done - Highlight the selected nuclet.
+Select 3 protons, draw a triangle
+calculate the fourth point and put the ghost proton there.
+Then save those positions in the nuclet files - have to add extra protons to the icosahedron, final, initial.
+
+
+What next?  The builder is in pretty good shape.  A quick style option?  Have it be the 
+
+Write something.
+
+
+
+Save what I have?
+I broke createNuclet into pieces.
+Add to the faces whether they are transparent or not - az_transparent = true
+When I save the atom save their transparency.
+
+There is only one reactive state.
+On the atom page show the current list of states that are selected.   This really isn't needed is it,.
+Display the name of the reactive state.
+Create a select list of current states of this atom.
+It will work much like the current select for style files.
+
+Have a new button, they 
+
+
+
+
+What am I doing?  I don't have any idea?  I want to know how to do it?
+
+
+What the fuck am I doing?  I don't really know.  
+
+
+Scene
+  I like having the Reset camera and Full screen buttons always there.  Buttons overlaying the builder area. 
+
+The sidebar is nice for semi-permenant stuff.
+
+   Reset camera
+   Full Screen
+
+   Atom  
+     In place editor to edit description, name, isotope, etc.  
+     Display information
+     Show # protons
+     actions
+       select atom
+       save
+       new
+       delete
+
+   Nuclet
+
+   Mouse Mode
+     Add/delete protons
+     Assign inner faces
+     Assign outer faces
+     Edit nuclet
+        Show in sidebar
+
+   Style 
+     Show 5 or six styles - config button pops up the style dialog
+     actions
+       show a list of styles
+        
+   
+      
+   Themes - 
+   

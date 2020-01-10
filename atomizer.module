@@ -1,0 +1,444 @@
+<?php
+
+/**
+ * @file
+ * Contains atomizer.module..
+ */
+
+use Drupal\atomizer\AtomizerFiles;
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\CloseModalDialogCommand;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Component\Serialization\Yaml;
+use Drupal\node\Entity\Node;
+use Drupal\node\NodeInterface;
+
+/**
+ * Implements hook_help().
+ */
+function atomizer_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the atomizer module.
+    case 'help.page.atomizer':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Interactively create atoms in a 3D image that can be rotated, saved, etc.') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function atomizer_theme() {
+  return [
+    // Display atom select list items and their sublists.
+    'atomizer_select_atom' => [
+      'variables' => [
+        'title' => '',
+        'symbol' => '',
+        'element_nid' => 0,
+        'stability' => '',
+        'default_atom_nid' => 0,
+        'atomic_number' => 0,
+        'num_isotopes' => 0,
+        'num_isobars' => 0,
+        'isotopes' => [],
+        'isobars' => [],
+      ],
+    ],
+    // Display atom select list items and their sublists.
+    'atomizer_select_molecule' => [
+      'variables' => [
+        'title' => '',
+        'molecule_nid' => 0,
+      ],
+    ],
+  ];
+}
+
+////////////////////// Atom Form Alters //////////////////////////
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Alter the node_atom_form.
+ *
+ * @param $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ */
+function atomizer_form_node_atom_edit_form_alter (&$form, FormStateInterface $form_state) {
+  _atomizer_atom_form_alter($form, $form_state);
+}
+function atomizer_form_node_atom_form_alter (&$form, FormStateInterface $form_state) {
+  _atomizer_atom_form_alter($form, $form_state);
+}
+
+function _atomizer_atom_form_alter(&$form, FormStateInterface $form_state) {
+  $form['actions']['preview']['#access'] = false;
+  $form['path']['#access'] = false;
+
+  if (!\Drupal::currentUser()->hasPermission('atomizer display structure')) {
+    $form['field_atomic_structure']['#access'] == false;
+
+    unset($form['advanced']);
+    foreach ($form as $key => $value) {
+      if (is_array($form[$key]) && isset($form[$key]['#group'])) {
+        unset($form[$key]);
+      }
+    }
+  }
+
+  $form['field_mass_actual']['widget'][0]['value']['#step'] = 'any';
+  $form['field_mass_calculated']['widget'][0]['value']['#step'] = 'any';
+  $form['field_mass_h_norm']['widget'][0]['value']['#step'] = 'any';
+
+  $form['#validate'][] = '_atomizer_atom_form_validate';
+  $form['actions']['submit']['#submit'][] = '_atomizer_atom_form_submit';
+  $form['actions']['submit']['#attributes']['class'][] = 'use-ajax-submit';
+
+//foreach (array_keys($form['actions']) as $action) {
+//  if ($action != 'preview' && isset($form['actions'][$action]['#type']) && $form['actions'][$action]['#type'] === 'submit') {
+//    $form['actions'][$action]['#submit'][] = '_atomizer_atom_form_submit';
+//  }
+//}
+}
+
+/**
+ * Validate the atom form
+ *
+ * @param $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ */
+function _atomizer_atom_form_validate(&$form, FormStateInterface &$form_state) {
+  //
+  if ($form_state->hasValue(['field_be_nucleon', 0, 'value']) &&
+      $form_state->hasValue(['field__protons', 0, 'value'])) {
+    // Given the per nucleon binding energy, calculate the binding energy for the full nucleus
+    $be_nucleon = $form_state->getValue('field_be_nucleon')[0]['value'];
+    $protons = $form_state->getValue('field__protons')[0]['value'];
+    $be_actual = $be_nucleon * $protons / 1000;
+    $form_state->setValue(['field_be_actual', 0, 'value'], $be_actual);
+
+    $shit = 'damn';
+
+    // Calculate the binding energy accuracy using SAM nuclet calculation.
+    if ($form_state->hasValue(['field_be_sam_nuclets', 0, 'value'])) {
+      $be_sam_nuclets = $form_state->getValue('field_be_sam_nuclets')[0]['value'];
+      $be_sam_nuclets_ = (($be_sam_nuclets > $be_actual) ? $be_actual/ $be_sam_nuclets : $be_sam_nuclets / $be_actual) * 100;
+      $form_state->setValue(['field_be_sam_nuclets_', 0, 'value'], substr($be_sam_nuclets_, 0, 10));
+    }
+
+    // Calculate the binding energy accuracy using SAM lines calculation.
+    if ($form_state->hasValue(['field_sam_lines', 0, 'value'])) {
+      $sam_lines = $form_state->getValue('field_sam_lines')[0]['value'];
+      $be_sam_lines = $sam_lines * 2.225;
+      $be_sam_lines_ = (($be_sam_lines > $be_actual) ? $be_actual/ $be_sam_lines : $be_sam_lines / $be_actual) * 100;
+      $form_state->setValue(['field_be_sam_lines', 0, 'value'], $be_sam_lines);
+      $form_state->setValue(['field_be_sam_lines_', 0, 'value'], substr($be_sam_lines_, 0,10));
+    }
+  }
+
+  if ($form_state->hasValue('field_element', 0, 'target_id')) {
+    $eid = $form_state->getValue('field_element')[0]['target_id'];
+    $element = Node::load($eid);
+    $form_state->setValue(['field_an_isotope',0,'value'], sprintf ("%3s:%3s\n", $element->field_atomic_number->value, $protons));
+  }
+
+  // Normalize the actual mass using hydrogen instead of carbon.
+  if ($form_state->hasValue(['field_mass_actual', 0, 'value'])) {
+    $form_state->setValue(['field_mass_h_norm', 0, 'value'], $form_state->getValue('field_mass_actual')[0]['value'] / 1.0078250322);
+  }
+    // Calculate mass using Carl Johnsons formula - this isn't correct - needs work.
+  if ($form_state->hasValue(['field__protons', 0, 'value']) &&
+      $form_state->hasValue(['field__inner_electrons', 0, 'value']) &&
+      $form_state->hasValue(['field__outer_electrons', 0, 'value'])) {
+    $massProton = 1.007276466879;
+    $massElectron = .000548579909070;
+    $mass = $massElectron * ($form_state->getValue('field__inner_electrons')[0]['value'] + $form_state->getValue('field__outer_electrons')[0]['value']) +
+      $massProton * $form_state->getValue('field__protons')[0]['value'];
+    //  $form_state->setValue(['field_mass_actual', 0, 'value'], $mass);
+    $form_state->setValue(['field_mass_calculated', 0, 'value'], $mass);
+
+    if ($form_state->hasValue(['field_mass_actual', 0, 'value'])) {
+      $actual = $form_state->getValue('field_mass_actual')[0]['value'];
+      if ($actual > 1000000) {
+        $form_state->setValue(['field_mass_actual', 0, 'value'], $actual / 1000000);
+      }
+    }
+  }
+}
+
+function _atomizer_atom_form_submit(&$form, FormStateInterface &$form_state) {
+  // @TODO this needs to be conditional - messes up the normal node/{nid}/edit submit process.
+  $form_state->setRebuild();
+  $response = new AjaxResponse();
+  $response->addCommand(new CloseModalDialogCommand());
+  $form_state->setResponse($response);
+}
+
+function _atomizer_what_is_this_form_alter_for (&$form, FormStateInterface $form_state) {
+  // Set the field_configuration_file option to the list of files in atomizer/config/producers.
+  $form['field_configuration_file']['#access'] = false;
+  $entity = $form_state->getFormObject()->getEntity();
+  $configFile = $entity->field_configuration_file->value;
+  $form['field_config'] = [
+    '#type' => 'select',
+    '#title' => t('Configuration file'),
+    '#default_value' => $configFile,
+    '#options' => AtomizerFiles::createFileList(drupal_get_path('module', 'atomizer') . '/config/producers', '/\.yml/'),
+  ];
+
+  $form['#validate'][] = 'atomizer_form_node_atomizer_validate';
+  foreach (array_keys($form['actions']) as $action) {
+    if ($action != 'preview' && isset($form['actions'][$action]['#type']) && $form['actions'][$action]['#type'] === 'submit') {
+      $form['actions'][$action]['#submit'][] = 'atomizer_form_node_atomizer_submit';
+    }
+  }
+}
+
+
+/**
+ *
+ * @param $form
+ * @param FormStateInterface $form_state
+ */
+function atomizer_form_node_molecule_edit_form_alter (&$form, FormStateInterface $form_state) {
+  _atomizer_molecule_form_alter($form, $form_state);
+}
+function atomizer_form_node_molecule_form_alter (&$form, FormStateInterface $form_state) {
+  _atomizer_molecule_form_alter($form, $form_state);
+}
+
+function _atomizer_molecule_form_alter(&$form, FormStateInterface $form_state) {
+  // Set text format of Formula field to Formula
+  return;
+}
+
+/**
+ * Implements hook_form_alter():
+ * @param $form
+ * @param FormStateInterface $form_state
+ */
+function atomizer_form_alter (&$form, FormStateInterface $form_state) {
+  return;
+}
+
+////////////////////// Atomizer Form Alters//////////////////////////
+
+/**
+ * Atomizer Edit form alterations - node-atomizer-form
+ *
+ * @param $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ */
+function atomizer_form_node_atomizer_form_alter (&$form, FormStateInterface $form_state) {
+  _atomizer_atomizer_form_alter($form, $form_state);
+}
+
+/**
+ * Atomizer Edit form alterations - node-atomizer-edit-form
+ *
+ * @param $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ */
+function atomizer_form_node_atomizer_edit_form_alter (&$form, FormStateInterface $form_state) {
+  _atomizer_atomizer_form_alter($form, $form_state);
+}
+
+function _atomizer_atomizer_form_alter (&$form, FormStateInterface $form_state) {
+  // Set the field_configuration_file option to the list of files in atomizer/config/producers.
+  $form['field_configuration_file']['#access'] = false;
+  $entity = $form_state->getFormObject()->getEntity();
+  $configFile = $entity->field_configuration_file->value;
+  $form['field_config'] = [
+    '#type' => 'select',
+    '#title' => t('Configuration file'),
+    '#default_value' => $configFile,
+    '#options' => AtomizerFiles::createFileList(drupal_get_path('module', 'atomizer') . '/config/producers', '/\.yml/'),
+  ];
+
+  $form['#validate'][] = 'atomizer_form_node_atomizer_validate';
+  foreach (array_keys($form['actions']) as $action) {
+    if ($action != 'preview' && isset($form['actions'][$action]['#type']) && $form['actions'][$action]['#type'] === 'submit') {
+      $form['actions'][$action]['#submit'][] = 'atomizer_form_node_atomizer_submit';
+    }
+  }
+}
+
+function atomizer_form_node_atomizer_submit (&$form, FormStateInterface &$form_state) {
+  return;
+}
+
+function atomizer_form_node_atomizer_validate (&$form, FormStateInterface $form_state) {
+  $form_state->setValue(['field_configuration_file', 0, 'value'], $form_state->getValue('field_config'));
+  return;
+}
+
+
+
+/**
+ * @param array $build
+ * @param \Drupal\node\NodeInterface $node
+ * @param $display
+ * @param $view_mode
+ */
+function atomizer_node_view(array &$build, EntityInterface $entity, $display, $view_mode) {
+//if ($node->getType() == 'book') {
+//  $build['#cache']['max-age'] = 0;
+//}
+//if ($node->getType() == 'atomizer' && $view_mode == 'atomizer') {
+//  $build['#cache']['max-age'] = 0;
+//}
+}
+/**
+ * Implements hook_preprocess_HOOK() for block.html.twig.
+ */
+function atomizer_preprocess_block(&$variables){
+  $variables['#cache']['max-age'] = 0;
+  if ($variables['plugin_id'] == 'atomizer_block') {
+    //-- This stops the block being cache in drupal 8
+    $variables['#cache']['max-age'] = 0;
+  }
+}
+
+
+function atomizer_preprocess_node(&$variables) {
+  $node = &$variables['node'];
+  $nid = $node->id();
+  $type = $node->getType();
+  switch ($type) {
+
+    case 'atomizer':
+      \Drupal::logger('atomizer')->notice('atomizer_preprocess_node:  node type ' . $type . ' nid ' . $nid);
+
+      // Read in configuration yml file
+      if (!empty($node->field_configuration_file)) {
+        \Drupal::logger('atomizer')->notice('atomizer_preprocess_node:  has field_configuration_file');
+        $atomizer_block = \Drupal::entityManager()->getStorage('block')->load('atom_builder');
+
+        if (!empty($atomizer_block)) {
+          // Read in the configuration file and save it back into the block for use later.
+          $configFile = $node->field_configuration_file->value;
+          \Drupal::logger('atomizer')->notice('atomizer_preprocess_node: configFile ' . $configFile . '  nid ' . $nid);
+          $atomizerConfig = Yaml::decode(file_get_contents(drupal_get_path('module', 'atomizer') . '/config/producers/' . $configFile));
+          $atomizerConfig['filename'] = $configFile;
+          $atomizer_block->getPlugin()->setConfigurationValue('atomizer_configuration', $atomizerConfig);
+          $atomizer_block->save();
+
+          /*
+          if (!$node->field_episode->isEmpty()) {
+            $eid = $node->field_episode->target_id;
+            $episode = Node::load($eid);
+            foreach($episode->field_scenes->getValue() as $scene) {
+              $pid = $scene['target_id']; // get scene id;
+              $scene = \Drupal::entityTypeManager()->getStorage('paragraph')->load($pid);
+              $atomizerConfig['scenes'][] = [
+                'title' => $scene->field_title->value,
+                'script' => $scene->field_script->value,
+                'description' => $scene->field_description->value,
+              ];
+            }
+          } */
+
+          $variables['atomizer_id'] = $atomizerConfig['atomizerId'];
+
+          $blockManager = \Drupal::service('plugin.manager.block');
+          $variables['content']['atomizer_block'] = $blockManager->createInstance('atomizer_block', [
+            'atomizerId' => $atomizerConfig['atomizerId'],
+            'controlFile' => $atomizerConfig['controlFile'],
+            'atomizerConfig' => $atomizerConfig,
+            'atomizerFile' => $configFile,
+          ])->build();
+//        $variables['content']['atomizer_block'] = $view->view($atomizer_block);
+        }
+      }
+      break;
+  } // switch ($type)
+
+  return;
+}
+
+function atomizer_calculate_mass($protons, $inner, $outer) {
+  $massProton = 1.007276466879;
+  $massElectron = .000548579909070;
+  $mass = $massElectron * ($inner + $outer) + $massProton * $protons;
+  return $mass;
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ */
+function atomizer_node_presave(EntityInterface $entity) {
+  switch ($entity->getType()) {
+    case 'atom':
+      $element = Node::load($entity->field_element->target_id);
+      $protons = $entity->field__protons->value;
+//  $inner = $entity->field__inner->value;
+//  $outer = $entity->field__outer->value;
+//  if (!$inner) {
+      $inner = $protons - $element->field_atomic_number->value;
+      $entity->field__inner_electrons->value = $inner;
+//  }
+//  if (!$outer) {
+      $outer = $element->field_atomic_number->value;
+      $entity->field__outer_electrons->value = $outer;
+//  }
+
+      // Calculate the mass as per Carl Johnson
+      $mass = atomizer_calculate_mass($protons, $inner, $outer);
+      $entity->field_mass_calculated->value = $mass;
+
+      // Calculate the hydrogen normalized mass.
+      $entity->field_mass_h_norm->value = $entity->field_mass_actual->value / 1.0078250322 ;
+      break;
+
+    case 'molecule':
+      // What am I doing, I setting the format on the field_formula to formula
+      $field = &$entity->field_formula;
+      $fart = 5;
+      break;
+  }
+  return;
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_create().  NODE
+ *
+ * @param EntityInterface $entity
+ */
+function atomizer_node_create(EntityInterface $entity) {
+  switch ($entity->getType()) {
+    case 'molecule':
+      $field = &$entity->field_formula;
+      $fart = 5;
+      break;
+
+  }
+
+  return 5;
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ *
+ * When creatings a new atom - set the path to /atom/{$nid}
+ **/
+function az_content_node_insert(NodeInterface $node) {
+
+  if ($node->getType() == 'atom') {
+    if ($node->toArray()['path'][0]['alias'] == "") {
+      $pathTitle = substr(str_replace(" ","-",trim(strtolower($node->label()))),0,60);
+      \Drupal::service('path.alias_storage')->save("/node/" . $node->id(), "/atom/" . $pathTitle, "en");
+    }
+  }
+}
+
+
+

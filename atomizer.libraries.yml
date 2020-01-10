@@ -1,0 +1,60 @@
+# Atomizer base files
+
+atomizer-base:
+  js:
+    js/libs/screenfull.js: {}
+    js/src/az_base.js: {}
+    js/src/az.js: {}
+    js/src/az_act.js: {}
+    js/src/az_controls.js: {}
+    js/src/az_episode.js: {}
+    js/src/az_htmlViewer.js: {}
+    js/src/az_scene.js: {}
+    js/src/az_set.js: {}
+    js/src/az_step_webform.js: {}
+    js/src/az_step_render_node.js: {}
+    js/src/az_step_video.js: {}
+# css:
+#   component:
+#     css/atomizer.css: {}
+  dependencies:
+    - core/drupal.dialog.ajax
+    - core/drupal.ajax
+
+atomizer-obfuscator:
+  js:
+    js/libs/screenfull.js: {}
+    js/min/az_base.js: {}
+    js/min/az.js: {}
+    js/min/az_act.js: {}
+    js/min/az_controls.js: {}
+    js/min/az_episode.js: {}
+    js/min/az_htmlViewer.js: {}
+    js/min/az_scene.js: {}
+    js/min/az_set.js: {}
+    js/min/az_step_webform.js: {}
+    js/min/az_step_render_node.js: {}
+    js/min/az_step_video.js: {}
+# css:
+#   component:
+#     css/atomizer.css: {}
+# dependencies:
+#   - core/drupal.dialog.ajax
+#   - core/drupal.ajax
+
+############ Money Game
+
+atomizer-money:
+  js:
+    js/src/az_board.js: {}
+    js/src/az_card.js: {}
+    js/src/az_arrow.js: {}
+    js/src/producers/prod_episode.js: {}
+
+atomizer-money-obfuscator:
+  js:
+    js/min/az_board.js: {}
+    js/min/az_card.js: {}
+    js/min/az_arrow.js: {}
+    js/min/producers/prod_episode.js: {}
+

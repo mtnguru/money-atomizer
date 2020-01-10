@@ -1,0 +1,13 @@
+
+Select Atom
+
+Retrieve a list of elements - order them by atomic number
+  Retrieve them by atomic number - get element id reference with it - order them by atomic number, then # protons
+  Go through each atom and create a hierarchical tree
+     If element has a default atom set it as the main element
+     If not then the lightest element is the main element 
+  Once the list is built - traverse it
+     Create render array with all atoms, hide the  
+
+Default Atom
+  Edit form for atom to have a checkbox for 'Set as Default'

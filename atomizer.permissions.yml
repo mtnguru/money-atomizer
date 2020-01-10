@@ -1,0 +1,29 @@
+atomizer display structure:
+  title: 'Atomizer Display Structure'
+  description: 'Display the structure of the atom on the Atom edit form.'
+atomizer display atom builder:
+  title: 'Atomizer Display Atom Builder'
+  description: 'Display the Atom Builder.'
+atomizer display atom viewer:
+  title: 'Atomizer Display Atom Viewer'
+  description: 'Allow user to view all the atoms.'
+atomizer embed atoms:
+  title: 'Atomizer Embed Atoms'
+  description: 'Allow user to embed atoms in WYSIWYG - must also have ability to use "Admin HTML" edit mode.'
+atomizer display all atoms:
+  title: 'Atomizer Display All Atoms'
+  description: 'Allow user to view unpublished atoms.'
+atomizer load raw js:
+  title: 'Atomizer Load Raw JS'
+  description: 'Load the raw JavaScript instead of obfuscated JS.'
+atomizer atoms development:
+  title: 'Atomizer Atoms Development'
+  description: 'User can view "development" atoms'
+atomizer atoms members:
+  title: 'Atomizer Atoms Members'
+  description: 'User can view "members" atoms'
+atomizer atoms trusted:
+  title: 'Atomizer Atoms Trusted'
+  description: 'User can view "trusted" atoms'
+
+

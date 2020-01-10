@@ -1,0 +1,33 @@
+
+What happened to my page?
+
+Create an Atomic Structure Research Group.
+Post stuff from everybody.
+Make a Nancy Bowen page.
+Create groups - 
+Create a main page.
+Make it so posts can be private or public
+
+Right now the domain module is a good start
+
+ASRG Groups - Do I really want groups?  
+  Neutron
+  Structure
+  
+  Nav menu
+    Home - Purpose - Make this a tab? - why not?
+    Always show the tabs for this group? - The group display in the top left.
+    Recent Posts
+    Members
+    Book
+
+  Make it so the top page of the book is the header page for the group.
+
+  The home tab will change as you go through the book.
+  Adding the tabs to each page requires a lot of queries.
+  This isn't a good idea. 
+  What if the tabs were
+    Group home
+    
+  
+  

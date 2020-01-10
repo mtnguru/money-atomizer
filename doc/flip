@@ -1,0 +1,18 @@
+Builder
+  Display the element name in upper bottom corner
+  
+    Create a list of elements - store zoom factor
+      Create function takes a picture of each element in order.
+      Display the element name in the image - on the canvas
+    Save all images to a directory
+    Zoom out as we proceed - 
+
+    elements:
+  (01)  Hydrogen 1: {node: 113, zoom: .5}
+  (02)  Hydrogen 2: {node: 242}
+  (03)  Hydrogen 3: {node: 103}
+  (04)  Lithium 6:  {node: 202}
+  (05)  Neon 20:    {node: 245}   
+  (06)  Sodium 23:  {node: 246, zoom: 1.2}   
+    
+  Zoom as we take

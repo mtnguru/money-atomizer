@@ -1,0 +1,28 @@
+
+
+<div id="card-peter" class="card-wrapper">
+  <div class="card">
+    <div class="card-header">
+      <h3>Peter</h3>
+    </div>
+    <div class="card-content">
+      <p>Here is the content for this card.</p>
+    </div>
+  </div>
+</div>
+
+
+So the game board is like a viewer.
+The atom-builder has the main viewer, and it has the pte viewer.
+Having two viewers might explain 
+
+This is the game board.  It's like the backdrop of the entire game.  Or is it?  Should it have it's own camera?
+
+Should each canvas have their own camera and scene, yes.
+The atom builder assumes a single primary canvas, but I could have multiple ones.  So how do I fix this?
+
+When I create the board, I create the camera.  Somehow the viewer class doesn't need to do anything.  For now.
+
+So the board starts a viewer.  The viewer manages the camera, renderer
+
+Does each viewer have its own controls?:q

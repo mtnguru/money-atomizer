@@ -1,0 +1,154 @@
+
+Make the controls, etc. into dialogs
+
+dialogs:
+  scene:
+    title: Scene
+    display: picture-o 
+    icon: scene
+    draggable: true
+    resize: false
+    items:
+      style--cameraReset:         ['Reset Camera',     'button']
+      viewer--fullScreen:         ['Full screen',      'toggle']
+      style--quick
+        - 'Quick Style:'
+        - radios
+        - base
+        -
+          base: Base
+          protons: Protons
+          structure: Structure
+          valence: Valence
+          charge: Charge
+
+  question:
+    title: Help Mode
+    display: popup
+    icon: question-circle
+    scroll: on/off/auto?
+    draggable: true/false
+    resize: true/false
+    items:
+      mode:
+
+  mode:
+    title: Selection Mode
+    display: popup
+    icon: mouse-pointer
+    scroll: on/off/auto?
+    draggable: true/false
+    resize: true/false
+    items:
+      mode:
+        - 'Mode'
+        - radios
+        - 
+          mode--none: None
+          mode--protons: Add/Delete Protons
+          mode--nuclets: Edit Nuclets
+          mode--inner-faces: Inner Faces
+          mode--outer-faces: Outer Faces
+  atom:
+    title: Atom
+    icon: bullseye
+    display: popup
+    items:
+      atom--info: ['', node, $VIEW_MODE]
+      atom--select:               ['Select Atom',      'button']
+      atom--save:                 ['Save Atom',        'button']
+      atom--saveNew:              ['Create New',       'link',    'modal',   'node.add',    {node_type: atom}]
+      atom--edit:                 ['Edit',             'link',    'node/48/edit']
+
+  nuclet:
+    title: Edit Nuclet
+    icon: futbol-o
+    scroll: on/off/auto?
+    draggable: true/false
+    resize: true/false
+    items:
+      nuclet--id:                 ['Id',               'container']
+      nuclet--state:
+        - 'State:'
+        - radios
+        - initial
+        -
+          lithium: 6 Lithium
+          beryllium: 8 Beryllium
+          boron: 10 Boron
+          carbon: 11 Carbon
+          initial: Initial Backbone
+          final: Final Backbone
+      nuclet--attachAngle:        ['Angle',            'range',   1,  [1, 5, 1]]
+      nuclet--attachProton:       ['Attach Pt',        'radios',  10, {10: '10', 11: '11'}]
+      nuclet--grow-label:         ['Grow Points',      'label']
+      nuclet--grow-0:             ['&nbsp;&nbsp;0',    'html',    '--']
+      nuclet--grow-1:             ['&nbsp;&nbsp;1',    'html',    '--']
+      nuclet--delete:             ['Delete',           'button']
+
+  style:
+    title: Style
+    icon: paint brush
+    scroll: on/off/auto?
+    draggable: true/false
+    resize: true/false
+    items:
+      style--select-block: 
+        - 'Select Style'
+        - select-block 
+        - 'base'
+        - 
+          particles:       @include controls/control-particles.yml
+          valence:         @include controls/control-valence.yml
+          axes:            @include controls/control-axes.yml
+          icosahedron:     @include controls/control-icosahedron.yml
+          icosahedronOut:  @include controls/control-icosahedron-out.yml
+          decahedron::     @include controls/control-decahedron:.yml
+          dodecahedron:    @include controls/control-dodecahedron.yml
+          dodecahedronOut: @include controls/control-dodecahedron-out.yml
+          octahedron:      @include controls/control-octahedron.yml
+          tetrahedron:     @include controls/control-tetrahedron.yml
+          scene:           @include controls/control-scene.yml
+          lighting:        @include controls/control-lighting.yml
+
+
+
+
+
+
+Have a location for the dialog
+   pinned dialog is on the left/right/top and takes space, therefore the canvas shrinks?
+   floating - dialog overlays the canvas
+   initial_location: location for the initial dialog
+   Base dialog class - is this necessary?  It's mostly JavaScript.  How do I break this apart?
+   I think I do create a base class for the dialog.  Or at least an interface.
+   Class: atomizer class that implements the dialog - is it a class?  
+
+
+=================================================================================================
+=                                                                                             ? =
+=                                                                                               =
+=                                                                                               =
+=                                                                                               =
+=                                                                                               =
+=                                                                                               =
+=                                                                                               =
+=                                                                                               =
+=                                                                                               =
+=                                                                                               =
+=                                                                                               =
+=                                                                                               =
+=                                                                                               =
+=                                                                                               =
+=                                                                                               =
+=                                                                                               =
+=                                                                                               =
+=                                                                                               =
+=                                                                                               =
+=                                                                                               =
+= atom nuclet                                                                                   =
+=================================================================================================
+   
+
+   
+

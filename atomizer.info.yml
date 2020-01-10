@@ -1,0 +1,7 @@
+name: Atomizer
+type: module
+description: Interactively create atoms in a 3D image that can be rotated, saved, etc.
+core: 8.x
+package: AZ
+dependicies:
+  - field
